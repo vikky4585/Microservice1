@@ -5,6 +5,8 @@ import java.util.Date;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class User {
 
 	private Integer id;
@@ -14,6 +16,7 @@ public class User {
 	
 	
 	@Past
+	//@JsonIgnore
 	private Date birthDate;
 	
 	
