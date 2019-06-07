@@ -14,6 +14,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 @RestController
 public class UserResource {
@@ -39,12 +44,31 @@ public class UserResource {
 	@GetMapping("/users/{i}")
 	public User getUser(@PathVariable int i) {
 		User user = service.findOne(i);
+		
 		if(user == null) {
 			throw new UserNotFoundException("user " + i + " not found");
 		}
 		
 
 		return user;
+	}
+	
+	
+	@GetMapping("/users/dynamic/{i}")
+	public MappingJacksonValue getDynamicFilterUser(@PathVariable int i) {
+		User user = service.findOne(i);
+		
+		SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("birthDate");
+		FilterProvider filters = new SimpleFilterProvider().addFilter("SomeTestFilter", filter);
+		
+		MappingJacksonValue mapping = new MappingJacksonValue(user);
+		mapping.setFilters(filters);
+		if(user == null) {
+			throw new UserNotFoundException("user " + i + " not found");
+		}
+		
+
+		return mapping;
 	}
 	
 	//@GetMapping("/users/{i}")
