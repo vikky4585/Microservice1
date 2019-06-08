@@ -16,6 +16,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,6 +59,11 @@ public class UserJPAResource {
 	}
 	
 	
+	@DeleteMapping("/jpa/users/{i}")
+	public void deleteUser(@PathVariable int i) {
+		userRepository.deleteById(i);
+	}
+	
 	@GetMapping("/jpa/users/dynamic/{i}")
 	public MappingJacksonValue getDynamicFilterUser(@PathVariable int i) {
 		User user = service.findOne(i);
@@ -94,7 +100,7 @@ public class UserJPAResource {
 	public ResponseEntity<User> create(@Valid @RequestBody User u) {
 		
 		
-		User user = service.add(u);
+		User user = userRepository.save(u);
 		
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
 		.path("/{id}")
@@ -104,10 +110,24 @@ public class UserJPAResource {
 		
 	}
 	
+	@GetMapping("/jpa/users/{id}/posts")
+	public List<Posts> getPosts(@PathVariable int id) {
+		Optional<User> user = userRepository.findById(id);
+		
+		if(!user.isPresent()) {
+			throw new UserNotFoundException("user " + id + " not found");
+		}
+		
+		
+		
+
+		return user.get().getPosts();
+	}
+	
 	//Internationalization
 	@GetMapping("/jpa/users/message")
 	public String getMessage(@RequestHeader(name="Accept-Language",required = false)Locale locale) {
-		return messageSource.getMessage("internation.message",null, locale);
+		return messageSource.getMessage("international.message",null, locale);
 	}
 
 }
