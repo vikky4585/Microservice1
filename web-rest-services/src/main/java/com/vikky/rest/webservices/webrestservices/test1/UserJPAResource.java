@@ -39,6 +39,9 @@ public class UserJPAResource {
 	private UserRepository userRepository;
 	
 	@Autowired
+	private PostsRepository postsRepository;
+	
+	@Autowired
 	private MessageSource messageSource;
 	
 	@GetMapping("/jpa/users")
@@ -105,6 +108,25 @@ public class UserJPAResource {
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
 		.path("/{id}")
 		.buildAndExpand(user.getId()).toUri();
+		
+		return ResponseEntity.created(uri).build();
+		
+	}
+	
+	@PostMapping("/jpa/users/{id}/posts")
+	public ResponseEntity<User> createPosts(@PathVariable int id, @RequestBody Posts posts) {
+		
+		
+		Optional<User> user = userRepository.findById(id);
+		if(!user.isPresent()) {
+			throw new UserNotFoundException("user " + id + " not found");
+		}
+		User userObj = user.get();
+		posts.setUser(userObj);
+		postsRepository.save(posts);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+		.path("/{id}")
+		.buildAndExpand(posts.getId()).toUri();
 		
 		return ResponseEntity.created(uri).build();
 		
