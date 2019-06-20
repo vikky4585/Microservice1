@@ -2,7 +2,7 @@ package com.vikky.microservices.limitsservice;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties("limit-service")
+@ConfigurationProperties("limits-service")
 public class Configuration {
 	
 	private int minimum;
